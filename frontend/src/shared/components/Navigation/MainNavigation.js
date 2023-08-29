@@ -20,7 +20,7 @@ const MainNavigation = () => {
             X
           </span>
           <nav
-            class="main-navigation__drawer-nav"
+            className="main-navigation__drawer-nav"
             style={mobileNavIsOpen ? { display: "block" } : { display: "none" }}
           >
             <NavLinks />
