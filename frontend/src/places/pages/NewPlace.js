@@ -4,39 +4,13 @@ import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../shared/utils/validators";
-import "./NewPlace.css";
 import Button from "../../shared/components/FormElements/Button";
-
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "INPUT_CHANGE":
-      let formIsValid = true;
-      for (const inputId in state.inputs) {
-        if (inputId === action.inputId) {
-          formIsValid = formIsValid && action.isValid;
-        } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.inputId]: {
-            value: action.val,
-            isValid: action.isValid,
-          },
-        },
-        isValid: formIsValid,
-      };
-    default:
-      return state;
-  }
-};
+import { useForm } from "../../shared/hooks/form-hook";
+import "./PlaceForm.css";
 
 const NewPlace = () => {
-  const [formState, dispatch] = useReducer(formReducer, {
-    inputs: {
+  const [formState, InputHandler] = useForm(
+    {
       title: {
         value: "",
         isValid: false,
@@ -50,24 +24,8 @@ const NewPlace = () => {
         isValid: false,
       },
     },
-    isValid: false,
-  });
-  const titleValue = formState.inputs.title.value;
-  const descriptionValue = formState.inputs.description.value;
-  console.log(
-    titleValue,
-    descriptionValue,
-    formState.inputs.title.isValid,
-    formState.inputs.description.isValid
+    false
   );
-  const InputHandler = useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT_CHANGE",
-      val: value,
-      inputId: id,
-      isValid: isValid,
-    });
-  }, []);
 
   const placeSubmitHandler = (e) => {
     e.preventDefault();
