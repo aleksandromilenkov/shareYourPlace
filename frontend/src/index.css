@@ -40,3 +40,14 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+.switchModeBtn {
+  border: none;
+  text-decoration: underline;
+  background-color: white;
+  cursor: pointer;
+}
+
+.switchModeBtn:hover {
+  color: #6f0094;
+}
