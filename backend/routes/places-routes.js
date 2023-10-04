@@ -1,5 +1,6 @@
 const express = require("express");
 const HttpError = require("../models/http-error");
+const { check } = require("express-validator");
 const {
   getPlaceById,
   getPlacesByUserId,
@@ -14,9 +15,21 @@ router.get("/:pid", getPlaceById);
 
 router.get("/user/:uid", getPlacesByUserId);
 
-router.post("/", createPlace);
+router.post(
+  "/",
+  [
+    check("title").notEmpty(),
+    check("description").isLength({ min: 5 }),
+    check("address").notEmpty(),
+  ],
+  createPlace
+);
 
-router.patch("/:pid", updatePlace);
+router.patch(
+  "/:pid",
+  [check("title").notEmpty(), check("description").isLength({ min: 5 })],
+  updatePlace
+);
 router.delete("/:pid", deletePlace);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const HttpError = require("../models/http-error");
 const { v4: uuidv4 } = require("uuid");
+const { validationResult } = require("express-validator");
+const getCoordsFromAddress = require("../util/getLocation");
 
 let DUMMY_PLACES = [
   {
@@ -72,23 +74,21 @@ const getPlacesByUserId = (req, res, next) => {
 };
 
 const createPlace = (req, res, next) => {
-  const { title, description, imageUrl, address, location, creator } = req.body;
-  if (
-    !title ||
-    !description ||
-    !imageUrl ||
-    !address ||
-    !Object.keys(location).length ||
-    !creator
-  ) {
-    return next(new HttpError("Please provide all info", 401));
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors, "ERROR IN CREATE PLACE METHOD IN PLACES CONTROLLER");
+    return next(
+      new HttpError("Invalid input, please check your input data", 422)
+    );
   }
+  const { title, description, imageUrl, address, creator } = req.body;
+  const coords = getCoordsFromAddress(address);
   const newPlace = {
     title,
     description,
     imageUrl,
+    location: coords,
     address,
-    location,
     creator,
     id: uuidv4(),
   };
@@ -100,6 +100,13 @@ const createPlace = (req, res, next) => {
 };
 
 const updatePlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    return next(
+      new HttpError("Invalid input, please check your input data", 422)
+    );
+  }
   const { title, description } = req.body;
   const { pid } = req.params;
   const placeToUpdate = { ...DUMMY_PLACES.find((p) => p.id === pid) };
@@ -115,6 +122,9 @@ const updatePlace = (req, res, next) => {
 
 const deletePlace = (req, res, next) => {
   const { pid } = req.params;
+  if (!DUMMY_PLACES.find((p) => p.id === pid)) {
+    return next(new HttpError("Could not find a place for that ID", 404));
+  }
   DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== pid);
   res.status(200).json({
     status: "success",
