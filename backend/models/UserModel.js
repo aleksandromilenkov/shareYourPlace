@@ -19,10 +19,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  places: {
-    type: String,
-    required: true,
-  },
+  places: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Place",
+    },
+  ],
 });
 userSchema.plugin(uniqueValidator);
 const User = mongoose.model("User", userSchema);

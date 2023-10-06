@@ -24,7 +24,7 @@ const signup = async (req, res, next) => {
         new HttpError("Invalid input, please check your input data", 422)
       );
     }
-    const { name, email, password, image, places } = req.body;
+    const { name, email, password } = req.body;
     const user = await User.findOne({ email: email });
     if (user) {
       const error = new HttpError("User with that e-mail already exists", 401);
@@ -37,8 +37,9 @@ const signup = async (req, res, next) => {
       image:
         "https://play-lh.googleusercontent.com/aAZvy2vK1GUeB0JR3pjEvhCYZ-nci12JciXr7Xy2oj5EvweA_ZMvWCmQyQsY-1NQXUoF",
       password,
-      places: "places in string",
+      places: [],
     });
+
     res.status(201).json({
       status: "success",
       data: newUser.toObject({ getters: true }),

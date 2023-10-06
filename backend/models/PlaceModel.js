@@ -28,7 +28,8 @@ const placeSchema = new mongoose.Schema({
     },
   },
   creator: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
 });

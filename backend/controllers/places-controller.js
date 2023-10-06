@@ -3,48 +3,8 @@ const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const getCoordsFromAddress = require("../util/getLocation");
 const Place = require("../models/PlaceModel");
-
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empile State",
-    description: "scy scraper big",
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIP0NXvv5YbGKbuGsC425k3eh5ZX7y8dH5og&usqp=CAU",
-    address: "New York, New York, USA",
-    location: {
-      lat: 40.74854,
-      lng: -73.98732,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Emp. State",
-    description: "scy scraper big",
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIP0NXvv5YbGKbuGsC425k3eh5ZX7y8dH5og&usqp=CAU",
-    address: "New York, New York, USA",
-    location: {
-      lat: 40.74854,
-      lng: -73.98732,
-    },
-    creator: "u2",
-  },
-  {
-    id: "p2",
-    title: "Rockfeler Center",
-    description: "scy scraper big",
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIP0NXvv5YbGKbuGsC425k3eh5ZX7y8dH5og&usqp=CAU",
-    address: "New York, New York, USA",
-    location: {
-      lat: 40.93233,
-      lng: -73.98732,
-    },
-    creator: "u2",
-  },
-];
+const User = require("../models/UserModel");
+const mongoose = require("mongoose");
 
 const getPlaceById = async (req, res, next) => {
   try {
@@ -101,12 +61,25 @@ const createPlace = async (req, res, next) => {
       image,
       location: coords,
       address,
-      creator,
+      creator: {
+        _id: creator,
+      },
     };
-    await Place.create(newPlace);
+    console.log(creator);
+    const user = await User.findById(creator);
+    console.log(user);
+    if (!user) {
+      return next(
+        new HttpError("We couldnt find user for the provided ID"),
+        404
+      );
+    }
+    const place = await Place.create(newPlace);
+    user.places.push(place);
+    await user.save();
     res.status(201).json({
       status: "success",
-      data: newPlace.toObject({ getters: true }),
+      data: place,
     });
   } catch (err) {
     console.log(err);
