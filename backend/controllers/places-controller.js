@@ -106,7 +106,7 @@ const createPlace = async (req, res, next) => {
     await Place.create(newPlace);
     res.status(201).json({
       status: "success",
-      data: newPlace,
+      data: newPlace.toObject({ getters: true }),
     });
   } catch (err) {
     console.log(err);
