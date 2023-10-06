@@ -1,10 +1,8 @@
 const HttpError = require("../models/http-error");
-const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const getCoordsFromAddress = require("../util/getLocation");
 const Place = require("../models/PlaceModel");
 const User = require("../models/UserModel");
-const mongoose = require("mongoose");
 
 const getPlaceById = async (req, res, next) => {
   try {
@@ -75,7 +73,7 @@ const createPlace = async (req, res, next) => {
       );
     }
     const place = await Place.create(newPlace);
-    user.places.push(place);
+    user.places.push(place); // establishing connection with the PlaceModel
     await user.save();
     res.status(201).json({
       status: "success",
@@ -116,7 +114,13 @@ const updatePlace = async (req, res, next) => {
 const deletePlace = async (req, res, next) => {
   try {
     const { pid } = req.params;
-    await Place.findOneAndDelete(pid);
+    const place = await Place.findById(pid).populate("creator");
+    if (!place) {
+      return next(new HttpError("Couldnt find place for this ID", 404));
+    }
+    await Place.deleteOne(place);
+    place.creator.places.pull(place); // remove the place from the User's array of places
+    await place.creator.save();
     res.status(200).json({
       status: "success",
       message: "Place deleted.",
