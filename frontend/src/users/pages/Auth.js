@@ -9,10 +9,14 @@ import {
 import Button from "../../shared/components/FormElements/Button";
 import Card from "../../shared/components/UIComponents/Card";
 import { AuthContext } from "../../shared/context/auth-context";
+import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
   const [mode, setMode] = useState("login");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -26,10 +30,37 @@ const Auth = () => {
     },
     false
   );
-  const authSubmitHandler = (e) => {
+  const authSubmitHandler = async (e) => {
     e.preventDefault();
-    auth.login();
-    console.log(formState);
+    setIsLoading(true);
+    if (mode === "login") {
+    } else {
+      try {
+        const resp = await fetch("http://localhost:5000/api/users/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+        });
+        console.log(resp);
+        const data = await resp.json();
+        setIsLoading(false);
+        if (!resp.ok) {
+          throw new Error(data.message);
+        }
+        auth.login();
+        console.log(formState);
+        console.log(data);
+      } catch (err) {
+        console.log(err);
+        setError(err.message || "Something went wrong");
+      }
+    }
   };
 
   const switchModeHandler = () => {
@@ -58,6 +89,10 @@ const Auth = () => {
     setMode((prevMode) => {
       return prevMode === "login" ? "signup" : "login";
     });
+  };
+
+  const errorHandler = () => {
+    setError(null);
   };
 
   const displayedForm =
@@ -103,8 +138,9 @@ const Auth = () => {
       <>
         {" "}
         <h2>Signup Required</h2>
+        {isLoading && <LoadingSpinner asOverlay />}
         <hr />
-        <form>
+        <form onSubmit={authSubmitHandler}>
           <Input
             id="name"
             element="input"
@@ -150,7 +186,12 @@ const Auth = () => {
         </div>
       </>
     );
-  return <Card className="authentication">{displayedForm}</Card>;
+  return (
+    <>
+      <ErrorModal error={error} onClear={errorHandler} />
+      <Card className="authentication">{displayedForm}</Card>
+    </>
+  );
 };
 
 export default Auth;

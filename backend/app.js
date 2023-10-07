@@ -12,6 +12,16 @@ const app = express();
 // parse the json body
 app.use(express.json({ limit: "10kb" }));
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "OPTIONS, GET, PATCH, POST, PUT, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
@@ -25,6 +35,7 @@ app.use((req, res, next) => {
 // this function will execute if any middleware before this function yielded an error
 app.use((error, req, res, next) => {
   // if response is already thrown:
+  console.log(error);
   if (res.headerSent) {
     return next(error);
   }

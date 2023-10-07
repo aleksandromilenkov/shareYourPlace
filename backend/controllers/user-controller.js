@@ -30,7 +30,7 @@ const signup = async (req, res, next) => {
       const error = new HttpError("User with that e-mail already exists", 401);
       return next(error);
     }
-
+    console.log(name, email, password);
     const newUser = await User.create({
       name,
       email,

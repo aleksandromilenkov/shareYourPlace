@@ -51,7 +51,7 @@ const createPlace = async (req, res, next) => {
         new HttpError("Invalid input, please check your input data", 422)
       );
     }
-    const { title, description, image, address, creator } = req.body;
+    const { title, description, image, address, creator, location } = req.body;
     const coords = getCoordsFromAddress(address);
     const newPlace = {
       title,
