@@ -3,6 +3,7 @@ import UserItem from "./UserItem";
 import Card from "../../shared/components/UIComponents/Card";
 import "./UsersList.css";
 const UsersList = (props) => {
+  console.log(props.items);
   if (!props.items?.length) {
     return (
       <div className="center">

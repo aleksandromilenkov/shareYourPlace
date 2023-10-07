@@ -1,42 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PlaceList from "../components/PlaceList";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
-
-const DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empile State",
-    description: "scy scraper big",
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIP0NXvv5YbGKbuGsC425k3eh5ZX7y8dH5og&usqp=CAU",
-    address: "New York, New York, USA",
-    location: {
-      lat: 40.74854,
-      lng: -73.98732,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Emp. State",
-    description: "scy scraper big",
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIP0NXvv5YbGKbuGsC425k3eh5ZX7y8dH5og&usqp=CAU",
-    address: "New York, New York, USA",
-    location: {
-      lat: 40.74854,
-      lng: -73.98732,
-    },
-    creator: "u2",
-  },
-];
+import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
 
 const UserPlaces = () => {
+  const [userPlaces, setUserPlaces] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const userId = useParams().userId;
-  const filteredPlaces = DUMMY_PLACES.filter(
-    (place) => place.creator === userId
+  useEffect(() => {
+    try {
+      const fetchUserPlaces = async () => {
+        setIsLoading(true);
+        const resp = await fetch(
+          `http://localhost:5000/api/places/user/${userId}`
+        );
+        const data = await resp.json();
+        console.log(resp);
+        if (!resp.ok) {
+          throw new Error(data.message || "Can't fetch places for this user");
+        }
+        console.log(data);
+        return data.data;
+      };
+      fetchUserPlaces()
+        .then((data) => {
+          setIsLoading(false);
+          setUserPlaces(data);
+        })
+        .catch((err) => setError(err));
+    } catch (err) {}
+  }, []);
+  const errorHandler = () => {
+    setError(null);
+    setIsLoading(false);
+  };
+  return (
+    <>
+      <PlaceList items={userPlaces} />
+    </>
   );
-  return <PlaceList items={filteredPlaces} />;
 };
 
 export default UserPlaces;

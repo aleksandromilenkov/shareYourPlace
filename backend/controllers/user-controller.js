@@ -5,7 +5,7 @@ const User = require("../models/UserModel");
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const allUsers = await User.find({}, "-password");
+    const allUsers = await User.find({}, "-password").populate("places");
     res.status(200).json({
       status: "success",
       data: allUsers.map((u) => u.toObject({ getters: true })),

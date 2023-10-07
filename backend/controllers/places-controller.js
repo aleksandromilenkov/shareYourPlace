@@ -52,12 +52,11 @@ const createPlace = async (req, res, next) => {
       );
     }
     const { title, description, image, address, creator, location } = req.body;
-    const coords = getCoordsFromAddress(address);
     const newPlace = {
       title,
       description,
       image,
-      location: coords,
+      location,
       address,
       creator: {
         _id: creator,

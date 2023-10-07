@@ -4,6 +4,7 @@ import Avatar from "../../shared/components/UIComponents/Avatar";
 import Card from "../../shared/components/UIComponents/Card";
 import { Link } from "react-router-dom";
 const UserItem = ({ id, name, image, placeCount }) => {
+  console.log(placeCount);
   return (
     <li className="user-item">
       <Card className="user-item__content">
@@ -14,7 +15,7 @@ const UserItem = ({ id, name, image, placeCount }) => {
           <div className="user-item__info">
             <h2>{name}</h2>
             <h3>
-              {placeCount} {placeCount === 1 ? "Place" : "Places"}
+              {placeCount.length} {placeCount === 1 ? "Place" : "Places"}
             </h3>
           </div>
         </Link>
