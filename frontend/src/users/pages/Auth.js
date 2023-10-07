@@ -34,6 +34,26 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     if (mode === "login") {
+      try {
+        const resp = await fetch("http://localhost:5000/api/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || data.status !== "success") {
+          throw new Error(data.message);
+        }
+        setIsLoading(false);
+        auth.login();
+      } catch (err) {
+        setError(err.message || "Something went wrong");
+      }
     } else {
       try {
         const resp = await fetch("http://localhost:5000/api/users/signup", {
@@ -47,15 +67,12 @@ const Auth = () => {
             password: formState.inputs.password.value,
           }),
         });
-        console.log(resp);
         const data = await resp.json();
         setIsLoading(false);
         if (!resp.ok) {
           throw new Error(data.message);
         }
         auth.login();
-        console.log(formState);
-        console.log(data);
       } catch (err) {
         console.log(err);
         setError(err.message || "Something went wrong");
@@ -93,12 +110,14 @@ const Auth = () => {
 
   const errorHandler = () => {
     setError(null);
+    setIsLoading(false);
   };
 
   const displayedForm =
     mode === "login" ? (
       <>
         <h2>Login Required</h2>
+        {isLoading && <LoadingSpinner asOverlay />}
         <hr />
         <form onSubmit={authSubmitHandler}>
           <Input
