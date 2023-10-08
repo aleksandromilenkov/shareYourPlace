@@ -11,13 +11,23 @@ export const useHttpClient = () => {
       const httpAbortController = new AbortController();
       activeHttpRequests.current.push(httpAbortController);
       try {
-        const resp = await fetch(url, {
-          method: method,
-          body: JSON.stringify(body),
-          headers: headers,
-          signal: httpAbortController.signal,
-        });
+        const resp = body
+          ? await fetch(url, {
+              method: method,
+              body: JSON.stringify(body),
+              headers: headers,
+              signal: httpAbortController.signal,
+            })
+          : await fetch(url, {
+              method: method,
+              headers: headers,
+              signal: httpAbortController.signal,
+            });
         const data = await resp.json();
+        activeHttpRequests.current = activeHttpRequests.current.filter(
+          (requestController) => requestController !== httpAbortController
+        );
+        console.log(data, resp);
         if (!resp.ok) {
           throw new Error(data?.message || "Can't fetch users");
         }
@@ -26,6 +36,8 @@ export const useHttpClient = () => {
         return data;
       } catch (err) {
         setError(err.message || "Something went wrong");
+        setIsLoading(false);
+        throw err;
       }
     },
     []
@@ -33,7 +45,7 @@ export const useHttpClient = () => {
 
   const clearError = () => {
     setError(null);
-    isLoading(false);
+    setIsLoading(false);
   };
 
   useEffect(() => {

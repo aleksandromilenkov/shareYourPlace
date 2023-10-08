@@ -15,11 +15,14 @@ import { useCallback, useState } from "react";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const login = useCallback(() => {
+  const [userId, setUserId] = useState(null);
+  const login = useCallback((id) => {
     setIsLoggedIn(true);
+    setUserId(id);
   }, []);
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setUserId(null);
   }, []);
   let routes;
   if (isLoggedIn) {
@@ -62,6 +65,7 @@ function App() {
         isLoggedIn: isLoggedIn,
         login: login,
         logout: logout,
+        userId: userId,
       }}
     >
       <Router>

@@ -3,42 +3,33 @@ import PlaceList from "../components/PlaceList";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
 const UserPlaces = () => {
   const [userPlaces, setUserPlaces] = useState([]);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const userId = useParams().userId;
   useEffect(() => {
-    try {
-      const fetchUserPlaces = async () => {
-        setIsLoading(true);
-        const resp = await fetch(
+    const fetchUserPlaces = async () => {
+      try {
+        const data = await sendRequest(
           `http://localhost:5000/api/places/user/${userId}`
         );
-        const data = await resp.json();
-        console.log(resp);
-        if (!resp.ok) {
-          throw new Error(data.message || "Can't fetch places for this user");
-        }
-        console.log(data);
-        return data.data;
-      };
-      fetchUserPlaces()
-        .then((data) => {
-          setIsLoading(false);
-          setUserPlaces(data);
-        })
-        .catch((err) => setError(err));
-    } catch (err) {}
+        setUserPlaces(data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchUserPlaces();
   }, []);
-  const errorHandler = () => {
-    setError(null);
-    setIsLoading(false);
-  };
   return (
     <>
-      <PlaceList items={userPlaces} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner asOverlay />
+        </div>
+      )}
+      {!isLoading && userPlaces && <PlaceList items={userPlaces} />}
     </>
   );
 };

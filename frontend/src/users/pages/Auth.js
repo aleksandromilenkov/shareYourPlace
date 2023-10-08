@@ -11,12 +11,12 @@ import Card from "../../shared/components/UIComponents/Card";
 import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
   const [mode, setMode] = useState("login");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -32,50 +32,43 @@ const Auth = () => {
   );
   const authSubmitHandler = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+
     if (mode === "login") {
       try {
-        const resp = await fetch("http://localhost:5000/api/users/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const data = await sendRequest(
+          "http://localhost:5000/api/users/login",
+          "POST",
+          {
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
-          }),
-        });
-        const data = await resp.json();
-        if (!resp.ok || data.status !== "success") {
-          throw new Error(data.message);
-        }
-        setIsLoading(false);
-        auth.login();
+          },
+          {
+            "Content-Type": "application/json",
+          }
+        );
+        console.log(data);
+        auth.login(data.data.id);
       } catch (err) {
-        setError(err.message || "Something went wrong");
+        console.log(err);
       }
     } else {
       try {
-        const resp = await fetch("http://localhost:5000/api/users/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        const data = await sendRequest(
+          "http://localhost:5000/api/users/signup",
+          "POST",
+          {
             name: formState.inputs.name.value,
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
-          }),
-        });
-        const data = await resp.json();
-        setIsLoading(false);
-        if (!resp.ok) {
-          throw new Error(data.message);
-        }
-        auth.login();
+          },
+          {
+            "Content-Type": "application/json",
+          }
+        );
+        console.log(data);
+        auth.login(data.data.id);
       } catch (err) {
         console.log(err);
-        setError(err.message || "Something went wrong");
       }
     }
   };
@@ -106,11 +99,6 @@ const Auth = () => {
     setMode((prevMode) => {
       return prevMode === "login" ? "signup" : "login";
     });
-  };
-
-  const errorHandler = () => {
-    setError(null);
-    setIsLoading(false);
   };
 
   const displayedForm =
@@ -207,7 +195,7 @@ const Auth = () => {
     );
   return (
     <>
-      <ErrorModal error={error} onClear={errorHandler} />
+      <ErrorModal error={error} onClear={clearError} />
       <Card className="authentication">{displayedForm}</Card>
     </>
   );

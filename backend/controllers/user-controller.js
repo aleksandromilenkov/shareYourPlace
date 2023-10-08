@@ -61,6 +61,7 @@ const login = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "logged in",
+      data: user.toObject({ getters: true }),
     });
   } catch (err) {
     return next(new HttpError("Can not login right now", 500));
