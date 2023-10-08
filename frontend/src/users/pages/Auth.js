@@ -33,7 +33,7 @@ const Auth = () => {
   );
   const authSubmitHandler = async (e) => {
     e.preventDefault();
-
+    console.log(formState.inputs);
     if (mode === "login") {
       try {
         const data = await sendRequest(
@@ -81,6 +81,7 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -90,6 +91,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -160,7 +165,7 @@ const Auth = () => {
             initialValue={formState.inputs.name?.value}
             initialIsValid={formState.inputs.name?.isValid}
           />
-          <ImageUpload id="image" center />
+          <ImageUpload id="image" center onInput={inputHandler} />
           <Input
             id="email"
             element="input"
