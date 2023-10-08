@@ -5,11 +5,17 @@ import Modal from "../../shared/components/UIComponents/Modal";
 import Map from "../../shared/components/UIComponents/Map";
 import "./PlaceItem.css";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
 
 const PlaceItem = (props) => {
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [warningModal, setDeleteWarningModal] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const history = useHistory();
   const openMapHandler = () => {
     setShowMap(true);
   };
@@ -22,12 +28,24 @@ const PlaceItem = (props) => {
   const cancelDeleteWarningHandler = () => {
     setDeleteWarningModal(false);
   };
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setDeleteWarningModal(false);
     console.log("Deleting...");
+    try {
+      const data = await sendRequest(
+        `http://localhost:5000/api/places/${props.id}`,
+        "DELETE"
+      );
+      console.log(data);
+      props.onDelete(props.id);
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
+
       <Modal
         header={props.address}
         contentClass="place-item__modal-content"
@@ -65,6 +83,11 @@ const PlaceItem = (props) => {
 
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && (
+            <div className="center">
+              <LoadingSpinner asOverlay />
+            </div>
+          )}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>

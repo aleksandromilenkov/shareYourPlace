@@ -22,14 +22,22 @@ const UserPlaces = () => {
     };
     fetchUserPlaces();
   }, []);
+  const deletePlaceHandler = (placeId) => {
+    setUserPlaces((prevData) => {
+      return prevData.filter((p) => p.id !== placeId);
+    });
+  };
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
       {isLoading && (
         <div className="center">
           <LoadingSpinner asOverlay />
         </div>
       )}
-      {!isLoading && userPlaces && <PlaceList items={userPlaces} />}
+      {!isLoading && userPlaces && (
+        <PlaceList items={userPlaces} onDelete={deletePlaceHandler} />
+      )}
     </>
   );
 };
