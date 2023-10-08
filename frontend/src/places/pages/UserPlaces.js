@@ -29,7 +29,6 @@ const UserPlaces = () => {
   };
   return (
     <>
-      <ErrorModal error={error} onClear={clearError} />
       {isLoading && (
         <div className="center">
           <LoadingSpinner asOverlay />

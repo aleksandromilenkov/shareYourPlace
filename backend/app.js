@@ -5,12 +5,36 @@ const usersRoutes = require("./routes/users-routes");
 const HttpError = require("./models/http-error");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-
+const path = require("path");
+const multer = require("multer");
 dotenv.config({ path: "./config.env" });
 const app = express();
 
+// UPLOADING IMAGES:
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}--${file.originalname}`);
+  },
+});
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+app.use(upload.single("image"));
+
 // parse the json body
 app.use(express.json({ limit: "10kb" }));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

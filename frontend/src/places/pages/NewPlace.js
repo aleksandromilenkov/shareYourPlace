@@ -43,14 +43,14 @@ const NewPlace = () => {
       const data = await sendRequest(
         "http://localhost:5000/api/places",
         "POST",
-        {
+        JSON.stringify({
           address: formState.inputs.address.value,
           description: formState.inputs.description.value,
           title: formState.inputs.title.value,
           image: "asdasdasd",
           location: { lat: 43.3245, lng: 22.42525 },
           creator: auth.userId,
-        },
+        }),
         {
           "Content-Type": "application/json",
         }

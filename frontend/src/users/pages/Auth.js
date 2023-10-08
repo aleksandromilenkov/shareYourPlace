@@ -39,10 +39,10 @@ const Auth = () => {
         const data = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
-          {
+          JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value,
-          },
+          }),
           {
             "Content-Type": "application/json",
           }
@@ -54,17 +54,15 @@ const Auth = () => {
       }
     } else {
       try {
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
         const data = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          {
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          },
-          {
-            "Content-Type": "application/json",
-          }
+          formData
         );
         console.log(data);
         auth.login(data.data.id);

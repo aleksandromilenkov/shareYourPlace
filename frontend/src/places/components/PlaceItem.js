@@ -15,7 +15,6 @@ const PlaceItem = (props) => {
   const [showMap, setShowMap] = useState(false);
   const [warningModal, setDeleteWarningModal] = useState(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const history = useHistory();
   const openMapHandler = () => {
     setShowMap(true);
   };

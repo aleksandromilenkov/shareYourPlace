@@ -11,18 +11,12 @@ export const useHttpClient = () => {
       const httpAbortController = new AbortController();
       activeHttpRequests.current.push(httpAbortController);
       try {
-        const resp = body
-          ? await fetch(url, {
-              method: method,
-              body: JSON.stringify(body),
-              headers: headers,
-              signal: httpAbortController.signal,
-            })
-          : await fetch(url, {
-              method: method,
-              headers: headers,
-              signal: httpAbortController.signal,
-            });
+        const resp = await fetch(url, {
+          method: method,
+          body: body,
+          headers: headers,
+          signal: httpAbortController.signal,
+        });
         const data = await resp.json();
         activeHttpRequests.current = activeHttpRequests.current.filter(
           (requestController) => requestController !== httpAbortController

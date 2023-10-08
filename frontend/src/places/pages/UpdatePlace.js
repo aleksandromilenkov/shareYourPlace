@@ -82,10 +82,10 @@ const UpdatePlace = () => {
         const data = await sendRequest(
           `http://localhost:5000/api/places/${placeId}`,
           "PATCH",
-          {
+          JSON.stringify({
             title: formState.inputs.title.value,
             description: formState.inputs.description.value,
-          },
+          }),
           { "Content-Type": "application/json" }
         );
         console.log(data);
