@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  useHistory,
+  useParams,
+} from "react-router-dom/cjs/react-router-dom.min";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import {
@@ -12,8 +15,10 @@ import Card from "../../shared/components/UIComponents/Card";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
+import { AuthContext } from "../../shared/context/auth-context";
 
 const UpdatePlace = () => {
+  const context = useContext(AuthContext);
   const placeId = useParams().placeId;
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [identifierPlace, setIdentifierPlace] = useState(null);
@@ -34,6 +39,7 @@ const UpdatePlace = () => {
     },
     false
   );
+  const history = useHistory();
   useEffect(() => {
     const fetchPlace = async () => {
       try {
@@ -71,8 +77,26 @@ const UpdatePlace = () => {
   const placeSubmitHandler = (e) => {
     e.preventDefault();
     console.log(formState);
+    const updateThePlace = async () => {
+      try {
+        const data = await sendRequest(
+          `http://localhost:5000/api/places/${placeId}`,
+          "PATCH",
+          {
+            title: formState.inputs.title.value,
+            description: formState.inputs.description.value,
+          },
+          { "Content-Type": "application/json" }
+        );
+        console.log(data);
+        history.push(`/${context.userId}/places`);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    updateThePlace();
   };
-  if (!identifierPlace) {
+  if (!identifierPlace && !error) {
     return (
       <div class="center">
         {isLoading && (
@@ -98,7 +122,7 @@ const UpdatePlace = () => {
           <LoadingSpinner asOverlay />
         </div>
       )}
-      {!isLoading && (
+      {!isLoading && identifierPlace && (
         <form className="place-form" onSubmit={placeSubmitHandler}>
           <Input
             id="title"
