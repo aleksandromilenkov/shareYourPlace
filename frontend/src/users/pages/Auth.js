@@ -175,9 +175,9 @@ const Auth = () => {
             element="input"
             label="Password"
             type="password"
-            errorText="Place enter valid password (Min 5 characters)"
+            errorText="Place enter valid password (Min 6 characters)"
             onInput={inputHandler}
-            validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(5)]}
+            validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(6)]}
             initialValue={formState.inputs.password?.value}
             initialIsValid={formState.inputs.password?.isValid}
           />
