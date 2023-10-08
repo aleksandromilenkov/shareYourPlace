@@ -12,6 +12,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
 import { useHttpClient } from "../../shared/hooks/http-hook";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
@@ -159,6 +160,7 @@ const Auth = () => {
             initialValue={formState.inputs.name?.value}
             initialIsValid={formState.inputs.name?.isValid}
           />
+          <ImageUpload id="image" center />
           <Input
             id="email"
             element="input"
