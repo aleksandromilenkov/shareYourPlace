@@ -163,7 +163,12 @@ const Auth = () => {
             initialValue={formState.inputs.name?.value}
             initialIsValid={formState.inputs.name?.isValid}
           />
-          <ImageUpload id="image" center onInput={inputHandler} />
+          <ImageUpload
+            id="image"
+            center
+            onInput={inputHandler}
+            errorText="Please provide an image"
+          />
           <Input
             id="email"
             element="input"

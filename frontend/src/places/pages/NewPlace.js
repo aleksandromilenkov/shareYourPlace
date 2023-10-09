@@ -12,6 +12,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import ErrorModal from "../../shared/components/UIComponents/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIComponents/LoadingSpinner";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 const NewPlace = () => {
   const auth = useContext(AuthContext);
@@ -26,8 +27,20 @@ const NewPlace = () => {
         value: "",
         isValid: false,
       },
+      lat: {
+        value: null,
+        isValid: false,
+      },
+      lng: {
+        value: null,
+        isValid: false,
+      },
       address: {
         value: "",
+        isValid: false,
+      },
+      image: {
+        value: null,
         isValid: false,
       },
     },
@@ -40,20 +53,19 @@ const NewPlace = () => {
     e.preventDefault();
     console.log(formState);
     try {
+      const formData = new FormData();
+      formData.append("address", formState.inputs.address.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("title", formState.inputs.title.value);
+      formData.append("lat", formState.inputs.lat.value);
+      formData.append("lng", formState.inputs.lng.value);
+      formData.append("image", formState.inputs.image.value);
+      formData.append("creator", auth.userId);
+      console.log(formState.inputs);
       const data = await sendRequest(
         "http://localhost:5000/api/places",
         "POST",
-        JSON.stringify({
-          address: formState.inputs.address.value,
-          description: formState.inputs.description.value,
-          title: formState.inputs.title.value,
-          image: "asdasdasd",
-          location: { lat: 43.3245, lng: 22.42525 },
-          creator: auth.userId,
-        }),
-        {
-          "Content-Type": "application/json",
-        }
+        formData
       );
       console.log(data);
       history.push("/");
@@ -81,12 +93,36 @@ const NewPlace = () => {
             onInput={InputHandler}
             id="title"
           />
+          <ImageUpload
+            id="image"
+            center
+            onInput={InputHandler}
+            errorText="Please provide an image"
+          />
           <Input
             label="Description"
             validators={[VALIDATOR_MINLENGTH(5)]}
             errorText="Place enter a valid description (at least 5 characters)"
             onInput={InputHandler}
             id="description"
+          />
+          <Input
+            element="input"
+            type="number"
+            label="Lattitude"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Place enter a valid lattitude"
+            onInput={InputHandler}
+            id="lat"
+          />
+          <Input
+            element="input"
+            type="number"
+            label="Longitude"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Place enter a valid Longitude"
+            onInput={InputHandler}
+            id="lng"
           />
           <Input
             element="input"

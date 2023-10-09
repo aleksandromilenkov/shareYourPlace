@@ -11,7 +11,7 @@ const fileUpload = multer({
   limits: 500000,
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "./images");
+      cb(null, "uploads/images");
     },
     filename: (req, file, cb) => {
       const extention = MIME_TYPE_MAP[file.mimetype];
@@ -19,11 +19,9 @@ const fileUpload = multer({
     },
   }),
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image")) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
+    const isValid = !!MIME_TYPE_MAP[file.mimetype];
+    let error = isValid ? null : new Error("Invalid mime type");
+    cb(error, isValid);
   },
 });
 
