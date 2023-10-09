@@ -34,8 +34,7 @@ const signup = async (req, res, next) => {
     const newUser = await User.create({
       name,
       email,
-      image:
-        "https://play-lh.googleusercontent.com/aAZvy2vK1GUeB0JR3pjEvhCYZ-nci12JciXr7Xy2oj5EvweA_ZMvWCmQyQsY-1NQXUoF",
+      image: req.file.path,
       password,
       places: [],
     });

@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const getCoordsFromAddress = require("../util/getLocation");
 const Place = require("../models/PlaceModel");
 const User = require("../models/UserModel");
+const fs = require("fs");
 
 const getPlaceById = async (req, res, next) => {
   try {
@@ -44,6 +45,7 @@ const getPlacesByUserId = async (req, res, next) => {
 
 const createPlace = async (req, res, next) => {
   try {
+    console.log(req.body.title, req.body.address, req.body.description);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log(errors, "ERROR IN CREATE PLACE METHOD IN PLACES CONTROLLER");
@@ -51,12 +53,15 @@ const createPlace = async (req, res, next) => {
         new HttpError("Invalid input, please check your input data", 422)
       );
     }
-    const { title, description, image, address, creator, location } = req.body;
+    const { title, description, address, creator, lat, lng } = req.body;
     const newPlace = {
       title,
       description,
-      image,
-      location,
+      image: req.file.path,
+      location: {
+        lat,
+        lng,
+      },
       address,
       creator: {
         _id: creator,
@@ -117,9 +122,11 @@ const deletePlace = async (req, res, next) => {
     if (!place) {
       return next(new HttpError("Couldnt find place for this ID", 404));
     }
+    const imagePath = place.image;
     await Place.deleteOne(place);
     place.creator.places.pull(place); // remove the place from the User's array of places
     await place.creator.save();
+    fs.unlink(imagePath, (err) => console.log(err));
     res.status(200).json({
       status: "success",
       message: "Place deleted.",
