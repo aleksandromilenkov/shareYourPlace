@@ -53,7 +53,11 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    if (!user || user.password !== password) {
+    if (!user) {
+      const error = new HttpError("Wrong email or password", 401);
+      return next(error);
+    }
+    if (await bcrypt.compare(user.password, password)) {
       const error = new HttpError("Wrong email or password", 401);
       return next(error);
     }
