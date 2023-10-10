@@ -60,7 +60,6 @@ const NewPlace = () => {
       formData.append("lat", formState.inputs.lat.value);
       formData.append("lng", formState.inputs.lng.value);
       formData.append("image", formState.inputs.image.value);
-      formData.append("creator", auth.userId);
       console.log(formState.inputs);
       const data = await sendRequest(
         "http://localhost:5000/api/places",

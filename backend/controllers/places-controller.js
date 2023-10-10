@@ -60,7 +60,7 @@ const createPlace = async (req, res, next) => {
         new HttpError("Invalid input, please check your input data", 422)
       );
     }
-    const { title, description, address, creator, lat, lng } = req.body;
+    const { title, description, address, lat, lng } = req.body;
     const newPlace = {
       title,
       description,
@@ -71,11 +71,10 @@ const createPlace = async (req, res, next) => {
       },
       address,
       creator: {
-        _id: creator,
+        _id: req.userId,
       },
     };
-    console.log(creator);
-    const user = await User.findById(creator);
+    const user = await User.findById(req.userId);
     console.log(user);
     if (!user) {
       return next(
