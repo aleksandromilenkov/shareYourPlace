@@ -45,7 +45,14 @@ const getPlacesByUserId = async (req, res, next) => {
 
 const createPlace = async (req, res, next) => {
   try {
-    console.log(req.body.title, req.body.address, req.body.description);
+    console.log(
+      req.body.title,
+      req.body.address,
+      req.body.description,
+      req.body.creator,
+      req.body.lat,
+      req.body.lng
+    );
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log(errors, "ERROR IN CREATE PLACE METHOD IN PLACES CONTROLLER");
@@ -57,7 +64,7 @@ const createPlace = async (req, res, next) => {
     const newPlace = {
       title,
       description,
-      image: req.file.path,
+      image: req?.file?.path || "123",
       location: {
         lat,
         lng,
