@@ -107,14 +107,16 @@ const updatePlace = async (req, res, next) => {
     }
     const { title, description } = req.body;
     const { pid } = req.params;
+    const place = await Place.findById(pid);
+    if (place.creator.toString() !== req.userId) {
+      return next(new HttpError("You are not allowed to edit this place", 401));
+    }
     const thePlace = await Place.findByIdAndUpdate(
       pid,
       { title, description },
       { new: true }
     );
-    if (thePlace.creator.toString() !== req.userId) {
-      return next(new HttpError("You are not allowed to edit this place", 401));
-    }
+
     res.status(200).json({
       status: "success",
       data: thePlace.toObject({ getters: true }),
@@ -131,6 +133,11 @@ const deletePlace = async (req, res, next) => {
     const place = await Place.findById(pid).populate("creator");
     if (!place) {
       return next(new HttpError("Couldnt find place for this ID", 404));
+    }
+    if (place.creator.id !== req.userId) {
+      return next(
+        new HttpError("You are not allowed to delete this place", 401)
+      );
     }
     const imagePath = place.image;
     await Place.deleteOne(place);
