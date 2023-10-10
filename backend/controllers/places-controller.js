@@ -112,6 +112,9 @@ const updatePlace = async (req, res, next) => {
       { title, description },
       { new: true }
     );
+    if (thePlace.creator.toString() !== req.userId) {
+      return next(new HttpError("You are not allowed to edit this place", 401));
+    }
     res.status(200).json({
       status: "success",
       data: thePlace.toObject({ getters: true }),
