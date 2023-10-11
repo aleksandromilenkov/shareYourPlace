@@ -49,7 +49,7 @@ Node package manager - npm.
 ## Installation
 1. Clone the repo
 ```
-git clone https://github.com/aleksandromilenkov/socialpedia.git
+git clone https://github.com/aleksandromilenkov/shareYourPlace.git
 ```
 2. Navigate to server folder and npm install there
 ```npm
